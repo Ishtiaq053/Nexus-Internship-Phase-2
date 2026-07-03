@@ -29,11 +29,13 @@ import { DealsPage } from './pages/deals/DealsPage';
 
 // Chat Pages
 import { ChatPage } from './pages/chat/ChatPage';
+import { BackendStatusBadge } from './components/ui/BackendStatusBadge';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <BackendStatusBadge />
         <Routes>
           {/* Authentication Routes */}
           <Route path="/login" element={<LoginPage />} />
