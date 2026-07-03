@@ -14,32 +14,39 @@ export const RegisterPage: React.FC = () => {
   const [role, setRole] = useState<UserRole>('entrepreneur');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { register } = useAuth();
+
+  const { register, user } = useAuth();
   const navigate = useNavigate();
-  
+
+  // Redirect once user state is populated after registration
+  React.useEffect(() => {
+    if (user) {
+      navigate(user.role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor', { replace: true });
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
-    // Validate passwords match
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
-    
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
     setIsLoading(true);
-    
     try {
       await register(name, email, password, role);
-      // Redirect based on user role
-      navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
     } catch (err) {
       setError((err as Error).message);
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -62,13 +69,14 @@ export const RegisterPage: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && (
-            <div className="mb-4 bg-error-50 border border-error-500 text-error-700 px-4 py-3 rounded-md flex items-start">
-              <AlertCircle size={18} className="mr-2 mt-0.5" />
+            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-md flex items-start gap-2">
+              <AlertCircle size={18} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Role selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 I am registering as a
@@ -86,7 +94,7 @@ export const RegisterPage: React.FC = () => {
                   <Building2 size={18} className="mr-2" />
                   Entrepreneur
                 </button>
-                
+
                 <button
                   type="button"
                   className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${
@@ -101,7 +109,7 @@ export const RegisterPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <Input
               label="Full name"
               type="text"
@@ -109,9 +117,10 @@ export const RegisterPage: React.FC = () => {
               onChange={(e) => setName(e.target.value)}
               required
               fullWidth
+              autoComplete="name"
               startAdornment={<User size={18} />}
             />
-            
+
             <Input
               label="Email address"
               type="email"
@@ -119,9 +128,10 @@ export const RegisterPage: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
+              autoComplete="email"
               startAdornment={<Mail size={18} />}
             />
-            
+
             <Input
               label="Password"
               type="password"
@@ -129,9 +139,10 @@ export const RegisterPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
+              autoComplete="new-password"
               startAdornment={<Lock size={18} />}
             />
-            
+
             <Input
               label="Confirm password"
               type="password"
@@ -139,9 +150,10 @@ export const RegisterPage: React.FC = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               fullWidth
+              autoComplete="new-password"
               startAdornment={<Lock size={18} />}
             />
-            
+
             <div className="flex items-center">
               <input
                 id="terms"
@@ -152,43 +164,24 @@ export const RegisterPage: React.FC = () => {
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
                 I agree to the{' '}
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-                  Terms of Service
-                </a>{' '}
+                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">Terms of Service</a>{' '}
                 and{' '}
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-                  Privacy Policy
-                </a>
+                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">Privacy Policy</a>
               </label>
             </div>
-            
-            <Button
-              type="submit"
-              fullWidth
-              isLoading={isLoading}
-            >
+
+            <Button type="submit" fullWidth isLoading={isLoading}>
               Create account
             </Button>
           </form>
-          
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or</span>
-              </div>
-            </div>
-            
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
-                  Sign in
-                </Link>
-              </p>
-            </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </div>

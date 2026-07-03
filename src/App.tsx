@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 // Layouts
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -35,67 +37,94 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         <BackendStatusBadge />
         <Routes>
-          {/* Authentication Routes */}
+          {/* ── Public routes ─────────────────────────────────────────── */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route path="entrepreneur" element={<EntrepreneurDashboard />} />
-            <Route path="investor" element={<InvestorDashboard />} />
+
+          {/* ── Protected: Dashboard ──────────────────────────────────── */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route
+              path="entrepreneur"
+              element={
+                <ProtectedRoute role="entrepreneur">
+                  <EntrepreneurDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="investor"
+              element={
+                <ProtectedRoute role="investor">
+                  <InvestorDashboard />
+                </ProtectedRoute>
+              }
+            />
           </Route>
-          
-          {/* Profile Routes */}
-          <Route path="/profile" element={<DashboardLayout />}>
+
+          {/* ── Protected: Profiles ───────────────────────────────────── */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="entrepreneur/:id" element={<EntrepreneurProfile />} />
             <Route path="investor/:id" element={<InvestorProfile />} />
           </Route>
-          
-          {/* Feature Routes */}
-          <Route path="/investors" element={<DashboardLayout />}>
-            <Route index element={<InvestorsPage />} />
-          </Route>
-          
-          <Route path="/entrepreneurs" element={<DashboardLayout />}>
-            <Route index element={<EntrepreneursPage />} />
-          </Route>
-          
-          <Route path="/messages" element={<DashboardLayout />}>
-            <Route index element={<MessagesPage />} />
-          </Route>
-          
-          <Route path="/notifications" element={<DashboardLayout />}>
-            <Route index element={<NotificationsPage />} />
-          </Route>
-          
-          <Route path="/documents" element={<DashboardLayout />}>
-            <Route index element={<DocumentsPage />} />
-          </Route>
-          
-          <Route path="/settings" element={<DashboardLayout />}>
-            <Route index element={<SettingsPage />} />
-          </Route>
-          
-          <Route path="/help" element={<DashboardLayout />}>
-            <Route index element={<HelpPage />} />
-          </Route>
-          
-          <Route path="/deals" element={<DashboardLayout />}>
-            <Route index element={<DealsPage />} />
-          </Route>
-          
-          {/* Chat Routes */}
-          <Route path="/chat" element={<DashboardLayout />}>
+
+          {/* ── Protected: Feature pages (any authenticated role) ─────── */}
+          {(
+            [
+              ['/investors', <InvestorsPage />],
+              ['/entrepreneurs', <EntrepreneursPage />],
+              ['/messages', <MessagesPage />],
+              ['/notifications', <NotificationsPage />],
+              ['/documents', <DocumentsPage />],
+              ['/settings', <SettingsPage />],
+              ['/help', <HelpPage />],
+              ['/deals', <DealsPage />],
+            ] as [string, React.ReactNode][]
+          ).map(([path, page]) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={page} />
+            </Route>
+          ))}
+
+          {/* ── Protected: Chat ───────────────────────────────────────── */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<ChatPage />} />
             <Route path=":userId" element={<ChatPage />} />
           </Route>
-          
-          {/* Redirect root to login */}
+
+          {/* ── Redirects ─────────────────────────────────────────────── */}
           <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {/* Catch all other routes and redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
