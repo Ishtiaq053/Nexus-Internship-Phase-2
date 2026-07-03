@@ -8,6 +8,7 @@ dotenv.config();
 
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
+import meetingRoutes from './routes/meetings';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,6 +39,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/meetings', meetingRoutes);
 
 // ─── Global 404 handler ───────────────────────────────────────────────────────
 app.use((_req: Request, res: Response) => {

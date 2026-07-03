@@ -70,7 +70,8 @@ export interface Document {
 
 export interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
+  token: string | null;
+  login: (email: string, password: string, role?: UserRole) => Promise<void>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
@@ -79,3 +80,25 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+export type MeetingStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+
+export interface MeetingParticipant {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string;
+  role: UserRole;
+}
+
+export interface Meeting {
+  id: string;
+  organizer: MeetingParticipant;
+  invitee: MeetingParticipant;
+  title: string;
+  startTime: string;
+  endTime: string;
+  status: MeetingStatus;
+  notes: string;
+  createdAt: string;
+}

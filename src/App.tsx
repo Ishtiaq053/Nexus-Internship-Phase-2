@@ -28,6 +28,7 @@ import { DocumentsPage } from './pages/documents/DocumentsPage';
 import { SettingsPage } from './pages/settings/SettingsPage';
 import { HelpPage } from './pages/help/HelpPage';
 import { DealsPage } from './pages/deals/DealsPage';
+import { MeetingsPage } from './pages/meetings/MeetingsPage';
 
 // Chat Pages
 import { ChatPage } from './pages/chat/ChatPage';
@@ -89,6 +90,7 @@ function App() {
             [
               ['/investors', <InvestorsPage />],
               ['/entrepreneurs', <EntrepreneursPage />],
+              ['/meetings', <MeetingsPage />],
               ['/messages', <MessagesPage />],
               ['/notifications', <NotificationsPage />],
               ['/documents', <DocumentsPage />],

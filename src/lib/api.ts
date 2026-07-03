@@ -125,3 +125,30 @@ export function apiGetMe() {
 export function apiUpdateMe(updates: Record<string, any>) {
   return api.put<{ user: any }>('/api/users/me', updates);
 }
+
+// ─── Meetings API ─────────────────────────────────────────────────────────────
+
+export interface CreateMeetingPayload {
+  inviteeId: string;
+  title: string;
+  startTime: string; // ISO string
+  endTime: string;   // ISO string
+  notes?: string;
+}
+
+export function apiGetMeetings(status?: string) {
+  return api.get<{ meetings: any[] }>('/api/meetings', status ? { params: { status } } : undefined);
+}
+
+export function apiCreateMeeting(payload: CreateMeetingPayload) {
+  return api.post<{ meeting: any }>('/api/meetings', payload);
+}
+
+export function apiRespondToMeeting(meetingId: string, response: 'accepted' | 'rejected') {
+  return api.put<{ meeting: any }>(`/api/meetings/${meetingId}/respond`, { response });
+}
+
+export function apiCancelMeeting(meetingId: string) {
+  return api.delete<{ message: string; meetingId: string }>(`/api/meetings/${meetingId}`);
+}
+
